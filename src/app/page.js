@@ -32,19 +32,19 @@ export default async function LandingPage() {
           )}
 
           {isLoggedIn ? (
-            <a
+            <Link
               href="/api/auth/logout"
               className="bg-white text-purple-700 px-4 py-2 rounded-full font-semibold hover:shadow-lg transition"
             >
               Log Out
-            </a>
+            </Link>
           ) : (
-            <a
+            <Link
               href="/api/auth/login"
               className="bg-white text-purple-700 px-4 py-2 rounded-full font-semibold hover:shadow-lg transition"
             >
               Log In
-            </a>
+            </Link>
           )}
         </nav>
       </header>
