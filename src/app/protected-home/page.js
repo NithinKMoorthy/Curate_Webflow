@@ -1,5 +1,4 @@
 import { getSession } from '@auth0/nextjs-auth0/edge';
-import { redirect } from 'next/navigation';
 import Link from 'next/link';
 
 // Force dynamic so Next.js doesn't attempt static optimization
