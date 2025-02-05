@@ -16,7 +16,7 @@ export default async function LandingPage() {
       <header className="px-6 py-4 flex items-center justify-between bg-purple-800 bg-opacity-50">
         {/* Logo or Brand Name */}
         <Link href="/" className="text-2xl font-bold hover:opacity-90">
-          Curate
+          Curate!!!!
         </Link>
 
         {/* Nav Items */}
