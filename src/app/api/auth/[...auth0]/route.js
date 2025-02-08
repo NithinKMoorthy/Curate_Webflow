@@ -4,7 +4,7 @@ import { handleAuth, handleLogin, handleLogout } from "@auth0/nextjs-auth0/edge"
 export const dynamic = "force-dynamic";
 
 export const GET = handleAuth({
-  async login(req) {
+  async login() {
     try {
       return await handleLogin( {
         authorizationParams: {
