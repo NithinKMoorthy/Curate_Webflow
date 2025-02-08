@@ -19,7 +19,7 @@ export const GET = handleAuth({
 
   async logout(req) {
     try {
-      return await handleLogout(req, {
+      return await handleLogout( {
         returnTo: "/", // Redirect user to homepage after logout
       });
     } catch (error) {
@@ -29,6 +29,6 @@ export const GET = handleAuth({
 });
 
 // Fix: Add a proper POST handler if needed
-export const POST = async (req) => {
+export const POST = async () => {
   return new Response("Method Not Allowed", { status: 405 });
 };
