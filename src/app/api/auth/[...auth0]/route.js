@@ -4,9 +4,9 @@ import { handleAuth, handleLogin, handleLogout } from "@auth0/nextjs-auth0/edge"
 export const dynamic = "force-dynamic";
 
 export const GET = handleAuth({
-  async login(req) {
+  async login() {
     try {
-      return await handleLogin({
+      return await handleLogin( {
         authorizationParams: {
           audience: "https://curate-api", // Ensure this matches your API audience
           scope: "openid profile email", // Include required scopes
@@ -17,9 +17,9 @@ export const GET = handleAuth({
     }
   },
 
-  async logout(req) {
+  async logout() {
     try {
-      return await handleLogout({
+      return await handleLogout( {
         returnTo: "/", // Redirect user to homepage after logout
       });
     } catch (error) {
