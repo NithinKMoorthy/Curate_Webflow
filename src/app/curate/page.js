@@ -72,11 +72,11 @@ export default function CuratePage() {
 
   // ✅ Add Subreddit to Selection
   function handleSelect(subreddit) {
-    const { id, display_name, title } = subreddit.data;
+    const { id, display_name } = subreddit.data;
     const imageUrl = getSubredditImage(subreddit);
 
     if (!selected.some((s) => s.id === id)) {
-      setSelected((prev) => [...prev, { id, display_name, title, imageUrl }]);
+      setSelected((prev) => [...prev, { id, display_name, imageUrl }]);
     }
   }
 

@@ -6,7 +6,7 @@ export const dynamic = "force-dynamic";
 export const GET = handleAuth({
   async login(req) {
     try {
-      return await handleLogin(req, {
+      return await handleLogin( {
         authorizationParams: {
           audience: "https://curate-api", // Ensure this matches your API audience
           scope: "openid profile email", // Include required scopes
