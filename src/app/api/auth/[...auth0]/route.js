@@ -17,7 +17,7 @@ export const GET = handleAuth({
     }
   },
 
-  async logout(req) {
+  async logout() {
     try {
       return await handleLogout( {
         returnTo: "/", // Redirect user to homepage after logout
