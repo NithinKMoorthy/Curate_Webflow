@@ -98,7 +98,7 @@ export default function CuratePage() {
           <div className="flex flex-wrap gap-4">
             {popularSubreddits.map((sub) => {
               console.log("SUB:", sub);
-              const { name, title,  } = sub;
+              const { name} = sub;
               const imageUrl = sub.iconUrl || "/default-reddit-icon.png";
 
               return (
