@@ -5,8 +5,8 @@ export const GET = handleAuth({
     try {
       return await handleLogin(req, {
         authorizationParams: {
-          audience: "https://curate-api",
-          scope: "openid profile email",
+          audience: "https://curate-api", // ✅ Ensure this matches your API Gateway audience
+          scope: "openid profile email", // ✅ Include necessary scopes
         },
       });
     } catch (error) {
