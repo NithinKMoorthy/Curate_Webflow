@@ -1,16 +1,4 @@
-import { handleAuth, handleLogin } from "@auth0/nextjs-auth0";
+import { handleAuth } from "@auth0/nextjs-auth0";
 
-export const GET = handleAuth({
-  async login(req) {
-    try {
-      return await handleLogin(req, {
-        authorizationParams: {
-          audience: "https://curate-api", // ✅ Ensure this matches your API Gateway audience
-          scope: "openid profile email", // ✅ Include necessary scopes
-        },
-      });
-    } catch (error) {
-      return new Response(error.message, { status: error.status || 500 });
-    }
-  },
-});
+export const GET = handleAuth();
+export const POST = handleAuth();
