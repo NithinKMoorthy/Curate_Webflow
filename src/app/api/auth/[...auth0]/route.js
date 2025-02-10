@@ -1,6 +1,5 @@
 import { handleAuth, handleLogin, handleLogout } from "@auth0/nextjs-auth0/edge";
 
-// Force dynamic to prevent static optimization
 export const dynamic = "force-dynamic";
 
 export const GET = handleAuth({
@@ -8,8 +7,8 @@ export const GET = handleAuth({
     try {
       return await handleLogin(req, {
         authorizationParams: {
-          audience: "https://curate-api", // Ensure this matches your API audience
-          scope: "openid profile email", // Include required scopes
+          audience: "https://curate-api",
+          scope: "openid profile email",
         },
       });
     } catch (error) {
@@ -20,7 +19,7 @@ export const GET = handleAuth({
   async logout(req) {
     try {
       return await handleLogout(req, {
-        returnTo: "/", // Redirect user to homepage after logout
+        returnTo: "https://main.d32znpesnpj1dh.amplifyapp.com", // ✅ Ensure this matches Auth0 settings
       });
     } catch (error) {
       return new Response(error.message, { status: error.status || 500 });
