@@ -18,9 +18,16 @@ export const GET = handleAuth({
 
   async logout(req) {
     try {
-      return await handleLogout(req, {
-        returnTo: "https://main.d32znpesnpj1dh.amplifyapp.com", // ✅ Ensure this matches Auth0 settings
+      const response = await handleLogout(req, {
+        returnTo: "https://main.d32znpesnpj1dh.amplifyapp.com",
       });
+
+      // ✅ Manually set CORS headers for logout
+      response.headers.set("Access-Control-Allow-Origin", "*");
+      response.headers.set("Access-Control-Allow-Methods", "GET, OPTIONS");
+      response.headers.set("Access-Control-Allow-Headers", "Content-Type, Authorization");
+
+      return response;
     } catch (error) {
       return new Response(error.message, { status: error.status || 500 });
     }
