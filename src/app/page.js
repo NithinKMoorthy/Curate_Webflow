@@ -24,12 +24,12 @@ export default async function LandingPage() {
                 Protected Home
               </Link>
             )}
-            <Link
+            <a
               href={isLoggedIn ? "/api/auth/logout" : "/api/auth/login"}
               className="bg-white text-purple-700 px-4 py-2 rounded-full font-semibold hover:shadow-lg transition"
             >
               {isLoggedIn ? 'Log Out' : 'Log In'}
-            </Link>
+            </a>
           </nav>
         </header>
 
