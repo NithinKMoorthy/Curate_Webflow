@@ -1,5 +1,5 @@
 import { getAccessToken } from "@auth0/nextjs-auth0";
-import { cookies } from "next/headers"; // ✅ Import `cookies()` for App Router
+import { cookies } from "next/headers"; // ✅ Ensure correct usage
 import { NextResponse } from "next/server";
 
 export async function GET() {
@@ -7,7 +7,6 @@ export async function GET() {
 
   try {
     const session = await getAccessToken({
-      cookies: cookies(), // ✅ Use cookies() instead of req
       authorizationParams: {
         audience: "https://curate-api",
         scope: "openid profile email",
@@ -15,14 +14,41 @@ export async function GET() {
     });
 
     if (!session || !session.accessToken) {
-      return NextResponse.json({ error: "Unauthorized: No access token found" }, { status: 401 });
+      return new NextResponse(JSON.stringify({ error: "Unauthorized: No access token found" }), {
+        status: 401,
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Methods": "GET, OPTIONS",
+          "Access-Control-Allow-Headers": "Content-Type, Authorization",
+        },
+      });
     }
 
     console.log("USER ACCESS TOKEN:", session.accessToken);
 
-    return NextResponse.json({ accessToken: session.accessToken });
+    return new NextResponse(
+      JSON.stringify({ accessToken: session.accessToken }),
+      {
+        status: 200,
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Methods": "GET, OPTIONS",
+          "Access-Control-Allow-Headers": "Content-Type, Authorization",
+        },
+      }
+    );
   } catch (error) {
     console.error("Error fetching access token:", error);
-    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+    return new NextResponse(
+      JSON.stringify({ error: "Internal Server Error" }),
+      {
+        status: 500,
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Methods": "GET, OPTIONS",
+          "Access-Control-Allow-Headers": "Content-Type, Authorization",
+        },
+      }
+    );
   }
 }
