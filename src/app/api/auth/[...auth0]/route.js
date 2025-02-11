@@ -2,6 +2,22 @@ import { handleAuth, handleLogin, handleLogout } from "@auth0/nextjs-auth0/edge"
 
 export const dynamic = "force-dynamic";
 
+const allowedOrigin = process.env.NODE_ENV === 'development' 
+  ? "*" 
+  : "https://main.d32znpesnpj1dh.amplifyapp.com";
+
+export const OPTIONS = (req) => {
+  return new Response(null, {
+    status: 200,
+    headers: {
+      "Access-Control-Allow-Origin": allowedOrigin,
+      "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+      "Access-Control-Allow-Headers": "Content-Type, Authorization",
+      "Access-Control-Max-Age": "86400",
+    },
+  });
+};
+
 export const GET = handleAuth({
   async login(req) {
     try {
@@ -22,8 +38,8 @@ export const GET = handleAuth({
         returnTo: "https://main.d32znpesnpj1dh.amplifyapp.com",
       });
 
-      // ✅ Manually set CORS headers for logout
-      response.headers.set("Access-Control-Allow-Origin", "*");
+      // Update CORS headers here too
+      response.headers.set("Access-Control-Allow-Origin", allowedOrigin);
       response.headers.set("Access-Control-Allow-Methods", "GET, OPTIONS");
       response.headers.set("Access-Control-Allow-Headers", "Content-Type, Authorization");
 

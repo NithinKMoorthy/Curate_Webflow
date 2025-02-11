@@ -9,6 +9,7 @@ export default function CuratePage() {
   const [selected, setSelected] = useState([]);
   const [token, setToken] = useState(null);
 
+  
   // ✅ Fetch Access Token on Component Mount
   useEffect(() => {
     async function fetchToken() {

@@ -1,6 +1,22 @@
 import { getAccessToken } from "@auth0/nextjs-auth0";
 import { NextResponse } from "next/server";
 
+const allowedOrigin = process.env.NODE_ENV === 'development' 
+  ? "*" 
+  : "https://main.d32znpesnpj1dh.amplifyapp.com";
+
+export const OPTIONS = (req) => {
+  return new Response(null, {
+    status: 200,
+    headers: {
+      "Access-Control-Allow-Origin": allowedOrigin,
+      "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+      "Access-Control-Allow-Headers": "Content-Type, Authorization",
+      "Access-Control-Max-Age": "86400",
+    },
+  });
+};
+
 export async function GET() {
   console.log("API ROUTE HIT - Fetching Auth0 Access Token");
 
@@ -16,7 +32,7 @@ export async function GET() {
       return new NextResponse(JSON.stringify({ error: "Unauthorized: No access token found" }), {
         status: 401,
         headers: {
-          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Origin": allowedOrigin,
           "Access-Control-Allow-Methods": "GET, OPTIONS",
           "Access-Control-Allow-Headers": "Content-Type, Authorization",
         },
@@ -30,7 +46,7 @@ export async function GET() {
       {
         status: 200,
         headers: {
-          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Origin": allowedOrigin,
           "Access-Control-Allow-Methods": "GET, OPTIONS",
           "Access-Control-Allow-Headers": "Content-Type, Authorization",
         },
@@ -43,7 +59,7 @@ export async function GET() {
       {
         status: 500,
         headers: {
-          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Origin": allowedOrigin,
           "Access-Control-Allow-Methods": "GET, OPTIONS",
           "Access-Control-Allow-Headers": "Content-Type, Authorization",
         },
