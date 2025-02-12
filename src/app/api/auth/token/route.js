@@ -1,13 +1,13 @@
-import { getAccessToken, withApiAuthRequired } from "@auth0/nextjs-auth0";
-import { NextResponse } from "next/server";
+import { getAccessToken } from "@auth0/nextjs-auth0";
+import { NextRequest, NextResponse } from "next/server";
 
-export const GET = withApiAuthRequired(async function GET() {
+export async function GET() {
   try {
     console.log("Fetching Access Token...");
-    
+
     const { accessToken } = await getAccessToken();
 
-    console.log(" Access Token:", accessToken);
+    console.log("Access Token:", accessToken);
 
     return NextResponse.json({ accessToken }, { status: 200 });
   } catch (error) {
@@ -18,4 +18,4 @@ export const GET = withApiAuthRequired(async function GET() {
       { status: error.status || 500 }
     );
   }
-});
+}
