@@ -1,7 +1,7 @@
 import { getAccessToken, withApiAuthRequired } from "@auth0/nextjs-auth0";
 import { NextResponse } from "next/server";
 
-export const GET = withApiAuthRequired(async function GET(req) {
+export const GET = withApiAuthRequired(async function GET() {
   try {
     console.log("Fetching Access Token...");
     
