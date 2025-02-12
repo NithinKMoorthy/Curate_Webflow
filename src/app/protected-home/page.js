@@ -19,11 +19,11 @@ export default function Home() {
     }
 
   };
-  const getM2MToken = async () => {
-    console.log("Hello");
-    const response = await axios.post('/api/management_token');
-    console.log("Response: ", response);
-  }
+  // const getM2MToken = async () => {
+  //   console.log("Hello");
+  //   const response = await axios.post('/api/management_token');
+  //   console.log("Response: ", response);
+  // }
   return (
     <main className="min-h-screen bg-gradient-to-b from-purple-600 to-purple-900 text-white">
       {/* Hero Section */}
