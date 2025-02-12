@@ -1,69 +1,21 @@
-import { getAccessToken } from "@auth0/nextjs-auth0";
+import { getAccessToken, withApiAuthRequired } from "@auth0/nextjs-auth0";
 import { NextResponse } from "next/server";
 
-const allowedOrigin = process.env.NODE_ENV === 'development' 
-  ? "*" 
-  : "https://main.d32znpesnpj1dh.amplifyapp.com";
-
-export const OPTIONS = (req) => {
-  return new Response(null, {
-    status: 200,
-    headers: {
-      "Access-Control-Allow-Origin": allowedOrigin,
-      "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-      "Access-Control-Allow-Headers": "Content-Type, Authorization",
-      "Access-Control-Max-Age": "86400",
-    },
-  });
-};
-
-export async function GET() {
-  console.log("API ROUTE HIT - Fetching Auth0 Access Token");
-
+export const GET = withApiAuthRequired(async function GET(req) {
   try {
-    const session = await getAccessToken({
-      authorizationParams: {
-        audience: "https://curate-api",
-        scope: "openid profile email",
-      },
-    });
+    console.log("Fetching Access Token...");
+    
+    const { accessToken } = await getAccessToken();
 
-    if (!session || !session.accessToken) {
-      return new NextResponse(JSON.stringify({ error: "Unauthorized: No access token found" }), {
-        status: 401,
-        headers: {
-          "Access-Control-Allow-Origin": allowedOrigin,
-          "Access-Control-Allow-Methods": "GET, OPTIONS",
-          "Access-Control-Allow-Headers": "Content-Type, Authorization",
-        },
-      });
-    }
+    console.log(" Access Token:", accessToken);
 
-    console.log("USER ACCESS TOKEN:", session.accessToken);
-
-    return new NextResponse(
-      JSON.stringify({ accessToken: session.accessToken }),
-      {
-        status: 200,
-        headers: {
-          "Access-Control-Allow-Origin": allowedOrigin,
-          "Access-Control-Allow-Methods": "GET, OPTIONS",
-          "Access-Control-Allow-Headers": "Content-Type, Authorization",
-        },
-      }
-    );
+    return NextResponse.json({ accessToken }, { status: 200 });
   } catch (error) {
-    console.error("Error fetching access token:", error);
-    return new NextResponse(
-      JSON.stringify({ error: "Internal Server Error" }),
-      {
-        status: 500,
-        headers: {
-          "Access-Control-Allow-Origin": allowedOrigin,
-          "Access-Control-Allow-Methods": "GET, OPTIONS",
-          "Access-Control-Allow-Headers": "Content-Type, Authorization",
-        },
-      }
+    console.error("🚨 Error fetching access token:", error);
+
+    return NextResponse.json(
+      { error: error.message || "Internal Server Error" },
+      { status: error.status || 500 }
     );
   }
-}
+});
