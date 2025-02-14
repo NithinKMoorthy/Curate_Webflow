@@ -20,7 +20,7 @@ export default async function LandingPage() {
           </Link>
           <nav className="flex items-center gap-4">
             {isLoggedIn && (
-              <Link href="/protected-home" className="text-white hover:underline underline-offset-2">
+              <Link href="/dashboard/protected-home" className="text-white hover:underline underline-offset-2">
                 Protected Home
               </Link>
             )}
@@ -42,7 +42,7 @@ export default async function LandingPage() {
           {isLoggedIn && <p className="text-lg font-semibold mb-6">Hello, {userName}!</p>}
           {isLoggedIn && (
             <Link
-              href="/protected-home"
+              href="/dashboard/protected-home"
               className="bg-white text-purple-700 px-6 py-3 rounded-full text-lg font-semibold hover:shadow-lg transition"
             >
               Go to Protected Home
