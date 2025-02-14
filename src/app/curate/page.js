@@ -50,11 +50,9 @@ export default function CuratePage() {
     if (!query.trim()) return;
 
     try {
-      const res = await fetch(
-        `https://www.reddit.com/subreddits/search.json?q=${encodeURIComponent(query)}&limit=10`
-      );
-      const data = await res.json();
-      setSubreddits(data?.data?.children || []);
+      const res = await axios.get(`/api/search?token=${token}&query=${query}`);
+      console.log("Search Res.data: ", res.data); 
+      setSubreddits(res.data.results || []);
     } catch (error) {
       console.error("Error fetching subreddits:", error);
       setSubreddits([]);
@@ -86,7 +84,6 @@ export default function CuratePage() {
     setSelected((prev) => prev.filter((s) => s.id !== id));
   }
 
-  console.log("POPULAR SUBREDDITS: ", popularSubreddits);
 
   return (
     <main className="min-h-screen w-full bg-gray-50 p-6">
@@ -98,7 +95,6 @@ export default function CuratePage() {
           <h2 className="text-lg font-semibold mb-2">Popular Subreddits</h2>
           <div className="flex flex-wrap gap-4">
             {popularSubreddits.map((sub) => {
-              console.log("SUB:", sub);
               const { name} = sub;
               const imageUrl = sub.iconUrl || "/default-reddit-icon.png";
 
@@ -145,12 +141,13 @@ export default function CuratePage() {
           {subreddits.length > 0 ? (
             <div className="flex flex-wrap gap-4">
               {subreddits.map((subreddit) => {
-                const { id, display_name } = subreddit.data;
-                const imageUrl = getSubredditImage(subreddit);
+                console.log("SUBBBBREDDITT: ", subreddit);
+                const { name } = subreddit;
+                const imageUrl = subreddit.iconUrl || "/default-reddit-icon.png";
 
                 return (
                   <div
-                    key={id}
+                    key={name}
                     className="w-20 h-20 rounded-full bg-gray-200 relative cursor-pointer hover:bg-gray-300 flex items-center justify-center text-center"
                     style={{
                       backgroundImage: `url(${imageUrl})`,
@@ -160,7 +157,7 @@ export default function CuratePage() {
                     onClick={() => handleSelect(subreddit)}
                   >
                     <span className="absolute inset-0 flex items-center justify-center text-xs font-bold text-white bg-black/50 rounded-full">
-                      r/{display_name}
+                      r/{name}
                     </span>
                   </div>
                 );
