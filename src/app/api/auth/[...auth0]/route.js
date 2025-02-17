@@ -33,6 +33,7 @@ export const GET = handleAuth({
   },
 
   async logout(req) {
+    console.log("LOGOUT");
     try {
       const response = await handleLogout(req, {
         returnTo: "https://main.d32znpesnpj1dh.amplifyapp.com",

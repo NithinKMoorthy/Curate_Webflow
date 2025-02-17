@@ -9,7 +9,6 @@ export default function CuratePage() {
   const [selected, setSelected] = useState([]);
   const [token, setToken] = useState(null);
 
-  // ✅ Fetch Access Token on Component Mount
   useEffect(() => {
     async function fetchToken() {
       try {
@@ -22,22 +21,56 @@ export default function CuratePage() {
     fetchToken();
   }, []);
 
-  // ✅ Fetch Popular Subreddits AFTER Token is Set
   useEffect(() => {
     if (!token) return;
 
     async function fetchPopularSubreddits() {
       try {
         const response = await axios.get(`/api/discover?token=${token}`);
+        console.log("POPULAR SUBREDDITS: ", response.data);
         setPopularSubreddits(response.data.popularSubreddits || []);
       } catch (error) {
         console.error("Error fetching popular subreddits:", error);
       }
     }
     fetchPopularSubreddits();
+    fetchPreferences();
   }, [token]);
 
-  // ✅ Fetch Subreddits Based on Search Query
+  async function fetchPreferences() {
+    if (!token) return;
+    try {
+      const response = await axios.get(`/api/getPreferences?token=${token}`);
+      console.log("Fetched Preferences:", response.data.preferences);
+      let preferences = response.data.preferences?.filter((p) => p?.id) ;
+      console.log("PREFERENCES: ", preferences);
+      setSelected(response.data.preferences);
+    } catch (error) {
+      console.error("Error fetching preferences:", error);
+    }
+  }
+
+  useEffect(() => {
+    if (!token || selected.length === 0) return;
+
+    async function savePreferences() {
+      console.log("Saving preferences ", selected);
+      let selectedNameArray = selected.map((selected) => selected?.display_name || "Unknown");
+      console.log("SELECTED NAME ARRAY: ", selectedNameArray);
+      try {
+        const response = await axios.post("/api/savePreference", {
+          token,
+          selectedNameArray,
+        });
+        console.log("Preferences Saved:", response.data);
+      } catch (error) {
+        console.error("Error saving preferences:", error);
+      }
+    }
+
+    savePreferences();
+  }, [selected]);
+
   async function handleSearch(e) {
     e.preventDefault();
     if (!query.trim()) return;
@@ -51,135 +84,79 @@ export default function CuratePage() {
     }
   }
 
-  // ✅ Add Subreddit to Selection
   function handleSelect(subreddit) {
-    console.log("Subreddit : ", subreddit);
+    console.log("SUBREDDIT: ", subreddit);
     setSelected((prev) => {
-      if (prev.some((s) => s.name === subreddit.name)) {
-        return prev; // Prevent duplicates
+      if (prev.some((s) => s?.id && s.id === subreddit?.id)) {
+        return prev;
       }
-      return [...prev, { 
-        id: subreddit.name, 
-        display_name: subreddit.display_name, 
-        imageUrl: subreddit.iconUrl || "/default-reddit-icon.png" 
-      }];
+      return [
+        ...prev,
+        {
+          id: subreddit?.name || `sub-${Math.random()}`,
+          display_name: subreddit?.name ? `r/${subreddit.name}` : "Unknown",
+          imageUrl: subreddit?.iconUrl ? subreddit.iconUrl : "/default-reddit-icon.png",
+        },
+      ];
     });
   }
-  
 
-  // ✅ Remove Subreddit from Selection
   function handleRemove(id) {
-    setSelected((prev) => prev.filter((s) => s.id !== id));
+    setSelected((prev) => prev.filter((s) => s?.id && s.id !== id));
   }
 
   return (
     <div className="flex min-h-screen bg-gray-50">
-      {/* Main Content next to Sidebar */}
       <main className="flex-1 ml-56 p-6 bg-gray-50">
         <div className="mx-auto bg-white shadow-md rounded-md p-6">
           <h1 className="text-3xl font-bold mb-4 text-center">Curate your home feed</h1>
 
-          {/* ✅ Popular Subreddits */}
           <div className="mb-8">
             <h2 className="text-lg font-semibold mb-2">Popular Subreddits</h2>
             <div className="flex flex-wrap gap-4">
-              {popularSubreddits.map((sub) => (
-                <div
-                  key={sub.name}
-                  className="w-20 h-20 rounded-full bg-gray-200 relative cursor-pointer hover:bg-gray-300 flex items-center justify-center text-center"
-                  style={{
-                    backgroundImage: `url(${sub.iconUrl || "/default-reddit-icon.png"})`,
-                    backgroundSize: "cover",
-                    backgroundPosition: "center",
-                  }}
-                  onClick={() => handleSelect(sub)}
-                >
-                  <span className="absolute inset-0 flex items-center justify-center text-xs font-bold text-white bg-black/50 rounded-full">
-                    r/{sub.name}
-                  </span>
-                </div>
-              ))}
+              {popularSubreddits
+                .filter((sub) => sub?.name)
+                .map((sub) => {
+                  let imageUrl = sub?.iconUrl ? sub.iconUrl : "/default-reddit-icon.png";
+                  return (
+                    <div
+                      key={sub?.name || `sub-${Math.random()}`}
+                      className="w-20 h-20 rounded-full bg-gray-200 relative cursor-pointer hover:bg-gray-300 flex items-center justify-center text-center"
+                      style={{
+                        backgroundImage: `url(${imageUrl})`,
+                        backgroundSize: "cover",
+                        backgroundPosition: "center",
+                      }}
+                      onClick={() => handleSelect(sub)}
+                    >
+                      <span className="absolute inset-0 flex items-center justify-center text-xs font-bold text-white bg-black/50 rounded-full">
+                        r/{sub?.name ? sub.name : "Unknown"}
+                      </span>
+                    </div>
+                  );
+                })}
             </div>
           </div>
 
-          {/* ✅ Search Form */}
-          <form onSubmit={handleSearch} className="flex items-center mb-6">
-            <input
-              type="text"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search subreddits..."
-              className="flex-grow border border-gray-300 rounded-l-md px-4 py-2 focus:outline-none focus:ring-1 focus:ring-purple-500"
-            />
-            <button
-              type="submit"
-              className="bg-purple-600 text-white px-6 py-2 rounded-r-md hover:bg-purple-700 transition-colors"
-            >
-              Search
-            </button>
-          </form>
-
-          {/* ✅ Search Results */}
-          <div className="mb-8">
-            <h2 className="text-lg font-semibold mb-2">Search Results</h2>
-            {subreddits.length > 0 ? (
-              <div className="flex flex-wrap gap-4">
-                {subreddits.map((subreddit) => (
-                  <div
-                    key={subreddit.id}
-                    className="w-20 h-20 rounded-full bg-gray-200 relative cursor-pointer hover:bg-gray-300 flex items-center justify-center text-center"
-                    style={{
-                      backgroundImage: `url(${subreddit.iconUrl || "/default-reddit-icon.png"})`,
-                      backgroundSize: "cover",
-                      backgroundPosition: "center",
-                    }}
-                    onClick={() => handleSelect(subreddit)}
-                  >
-                    <span className="absolute inset-0 flex items-center justify-center text-xs font-bold text-white bg-black/50 rounded-full">
-                      r/{subreddit.display_name}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <p className="text-sm text-gray-500">No results found or not searched yet.</p>
-            )}
-          </div>
-
-          {/* ✅ Selected Subreddits */}
           <div>
             <h2 className="text-lg font-semibold mb-2">Your Selections</h2>
             {selected.length > 0 ? (
               <div className="flex flex-wrap gap-4">
-                  {selected.map((item) => {
-                    console.log('item: ', item);
+                {selected
+                  .filter((item) => item && item?.id)
+                  .map((item) => {
+                    let imageUrl = item?.imageUrl ? item.imageUrl : "/default-reddit-icon.png";
+                    console.log("ITEM: ", item);
                     return (
-            
-                    <div
-                      key={item.id}
-                      className="w-20 h-20 rounded-full bg-gray-200 relative flex items-center justify-center text-center"
-                      style={{
-                        backgroundImage: `url(${item.imageUrl})`,
-                        backgroundSize: "cover",
-                        backgroundPosition: "center",
-                      }}
-                    >
-                      <span className="absolute inset-0 flex items-center justify-center text-xs font-bold text-white bg-black/50 rounded-full">
-                        r/{item.display_name}
-                      </span>
-                      <button
-                        onClick={() => handleRemove(item.id)}
-                        className="absolute top-0 right-0 bg-red-500 hover:bg-red-600 text-white w-6 h-6 rounded-full text-xs flex items-center justify-center transform translate-x-1/3 -translate-y-1/3"
-                      >
-                        X
-                      </button>
-                    </div>
-                  
-                  )}
-                )}
+                      <div key={item.id} className="w-20 h-20 bg-gray-200">
+                        <span>r/{item?.display_name ? item.display_name : "Unknown"}</span>
+                        <button onClick={() => handleRemove(item.id)}>X</button>
+                      </div>
+                    );
+                  })}
               </div>
             ) : (
-              <p className="text-sm text-gray-500">No subreddits selected yet.</p>
+              <p>No subreddits selected yet.</p>
             )}
           </div>
         </div>

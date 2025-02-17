@@ -1,7 +1,7 @@
 import axios from "axios";
 import { NextResponse } from "next/server";
 
-const API_URL = `https://vj7uo68ik2.execute-api.us-west-2.amazonaws.com/newsfeed?userId=annoymous`;
+const API_URL = `https://vj7uo68ik2.execute-api.us-west-2.amazonaws.com/newsfeed`;
 
 export async function GET(req) {
   console.log("API ROUTE for Newsfeed API Hit");
