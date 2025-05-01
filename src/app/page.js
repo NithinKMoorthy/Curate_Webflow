@@ -1,62 +1,79 @@
+'use client';
+
+import React from 'react';
+import { useUser } from '@auth0/nextjs-auth0/client';
 import Link from 'next/link';
-import { getSession } from '@auth0/nextjs-auth0/edge';
+import { ArrowRight, LogIn, LogOut } from 'lucide-react';
 
-// Force dynamic to check session on each request
-export const dynamic = 'force-dynamic';
+export default function LandingPage() {
+  const { user, isLoading } = useUser();
 
-export default async function LandingPage() {
-  try {
-    // Get the session from Auth0
-    const session = await getSession();
-    const isLoggedIn = Boolean(session?.user);
-    const userName = session?.user?.name || '';
-
-    return (
-      <main className="min-h-screen bg-gradient-to-b from-purple-600 to-purple-900 text-white">
-        {/* Navigation Bar */}
-        <header className="px-6 py-4 flex items-center justify-between bg-purple-800 bg-opacity-50">
-          <Link href="/" className="text-2xl font-bold hover:opacity-90">
-            Curate
-          </Link>
-          <nav className="flex items-center gap-4">
-            {isLoggedIn && (
-              <Link href="/dashboard/protected-home" className="text-white hover:underline underline-offset-2">
-                Protected Home
-              </Link>
+  return (
+    <div className="min-h-screen bg-gray-50 flex flex-col justify-between">
+      {/* Header */}
+      <header className="px-6 py-4 bg-white shadow-sm flex justify-between items-center sticky top-0 z-10">
+        <h1 className="text-2xl font-bold text-indigo-600">Curate</h1>
+        {!isLoading && (
+          <div>
+            {user ? (
+              <a
+                href="/api/auth/logout"
+                className="flex items-center text-sm text-gray-600 hover:text-gray-800"
+              >
+                <LogOut size={18} className="mr-1" />
+                Log out
+              </a>
+            ) : (
+              <a
+                href="/api/auth/login"
+                className="flex items-center text-sm text-indigo-600 hover:text-indigo-800"
+              >
+                <LogIn size={18} className="mr-1" />
+                Log in
+              </a>
             )}
-            <a
-              href={isLoggedIn ? "/api/auth/logout" : "/api/auth/login"}
-              className="bg-white text-purple-700 px-4 py-2 rounded-full font-semibold hover:shadow-lg transition"
-            >
-              {isLoggedIn ? 'Log Out' : 'Log In'}
-            </a>
-          </nav>
-        </header>
+          </div>
+        )}
+      </header>
 
-        {/* Landing Content */}
-        <section className="p-6 flex flex-col items-center justify-center text-center mt-16">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">Welcome to Curate</h1>
-          <p className="text-xl md:text-2xl mb-8 max-w-xl">
-            Your personalized home feed for everything you care about.
-          </p>
-          {isLoggedIn && <p className="text-lg font-semibold mb-6">Hello, {userName}!</p>}
-          {isLoggedIn && (
-            <Link
-              href="/dashboard/protected-home"
-              className="bg-white text-purple-700 px-6 py-3 rounded-full text-lg font-semibold hover:shadow-lg transition"
-            >
-              Go to Protected Home
-            </Link>
-          )}
-        </section>
+      {/* Hero Section */}
+      <main className="flex-1 flex flex-col items-center justify-center text-center px-6">
+      <div className="flex justify-center mb-6">
+          <img
+            src="/logo.jpeg"
+            alt="Curate logo"
+            width={200}
+            height={200}
+            className="rounded-xl shadow-sm border border-gray-200"
+          />
+        </div>
+        <h2 className="text-3xl font-bold mb-4 text-gray-900">
+          Simplify Your Content Life
+        </h2>
+        <p className="text-lg text-gray-600 max-w-md mb-6">
+          Curate helps you discover and summarize the most important insights from podcasts, articles, Reddit, and more — all in one feed.
+        </p>
+
+        {user ? (
+          <Link href="/onboarding" className="inline-flex items-center px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-medium transition">
+            Go to Dashboard
+            <ArrowRight size={18} className="ml-2" />
+          </Link>
+        ) : (
+          <a
+            href="/api/auth/login"
+            className="inline-flex items-center px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-medium transition"
+          >
+            Get Started
+            <ArrowRight size={18} className="ml-2" />
+          </a>
+        )}
       </main>
-    );
-  } catch (error) {
-    console.error('Error fetching session:', error);
-    return (
-      <main className="min-h-screen flex items-center justify-center bg-purple-600 text-white">
-        <p className="text-lg">Error loading page. Please try again later.</p>
-      </main>
-    );
-  }
+
+      {/* Footer */}
+      <footer className="px-6 py-4 text-center text-sm text-gray-400 bg-white border-t">
+        &copy; {new Date().getFullYear()} Curate. All rights reserved.
+      </footer>
+    </div>
+  );
 }
