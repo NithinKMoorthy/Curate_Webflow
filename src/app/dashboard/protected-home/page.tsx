@@ -9,7 +9,7 @@ import Link from 'next/link';
 interface Tab {
   id: string;
   name: string;
-  icon: JSX.Element;
+  Icon: React.ComponentType<{ size?: number }>;
 }
 
 interface ContentItem {
@@ -28,9 +28,9 @@ const ForYouPage = () => {
   const [activeTopic, setActiveTopic] = useState<string>('All Content');
 
   const tabs: Tab[] = [
-    { id: 'forYou', name: 'For You', icon: <Home size={20} /> },
-    { id: 'trending', name: 'Trending', icon: <TrendingUp size={20} /> },
-    { id: 'saved', name: 'Saved', icon: <Bookmark size={20} /> },
+    { id: 'forYou', name: 'For You', Icon: Home },
+    { id: 'trending', name: 'Trending', Icon: TrendingUp },
+    { id: 'saved', name: 'Saved', Icon: Bookmark },
   ];
 
   const contentItems: ContentItem[] = [
@@ -77,8 +77,13 @@ const ForYouPage = () => {
   ];
 
   const topics: string[] = [
-    'All Content', 'Technology', 'Design', 'SaaS',
-    'Product Management', 'Marketing', 'UX Research'
+    'All Content',
+    'Technology',
+    'Design',
+    'SaaS',
+    'Product Management',
+    'Marketing',
+    'UX Research'
   ];
 
   return (
@@ -146,7 +151,7 @@ const ForYouPage = () => {
               }`}
               onClick={() => setActiveTab(tab.id)}
             >
-              <span className="mr-2">{tab.icon}</span>
+              <span className="mr-2"><tab.Icon size={20} /></span>
               <span className="font-medium">{tab.name}</span>
             </button>
           ))}
