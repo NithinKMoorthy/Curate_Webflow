@@ -1,13 +1,19 @@
-'use client'
+'use client';
 import React, { useState } from 'react';
 import { Check, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 
+// ✅ Define types
+type Source = {
+  name: string;
+  icon: string;
+};
+
 function OnboardingPage() {
   const [currentStep, setCurrentStep] = useState(0);
-  const [selectedSources, setSelectedSources] = useState([]);
-  const [selectedTopics, setSelectedTopics] = useState([]);
-  
+  const [selectedSources, setSelectedSources] = useState<string[]>([]);
+  const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
+
   const steps = [
     {
       title: 'Welcome to Curate',
@@ -26,12 +32,12 @@ function OnboardingPage() {
       description: 'Get the key points without the noise.'
     },
     {
-      title: 'You\'re All Set!',
+      title: "You're All Set!",
       description: 'Your personalized feed is ready. Start exploring tailored content now.'
     }
   ];
-  
-  const sources = [
+
+  const sources: Source[] = [
     { name: 'Reddit', icon: '/api/placeholder/40/40' },
     { name: 'X (Twitter)', icon: '/api/placeholder/40/40' },
     { name: 'Medium', icon: '/api/placeholder/40/40' },
@@ -39,60 +45,43 @@ function OnboardingPage() {
     { name: 'YouTube', icon: '/api/placeholder/40/40' },
     { name: 'RSS', icon: '/api/placeholder/40/40' }
   ];
-  
+
   const topics = [
-    'Technology',
-    'Business',
-    'Science',
-    'Health',
-    'Politics',
-    'Sports',
-    'Entertainment',
-    'Design',
-    'Education',
-    'Finance',
-    'Travel',
-    'Food'
+    'Technology', 'Business', 'Science', 'Health', 'Politics',
+    'Sports', 'Entertainment', 'Design', 'Education',
+    'Finance', 'Travel', 'Food'
   ];
-  
+
   const features = [
     'Personalized summaries of the content you care about',
     'Save hours of reading and listening time',
     'Discover insights you might have missed'
   ];
-  
-  function toggleSource(name) {
-    if (selectedSources.includes(name)) {
-      setSelectedSources(selectedSources.filter(s => s !== name));
-    } else {
-      setSelectedSources([...selectedSources, name]);
-    }
+
+  function toggleSource(name: string) {
+    setSelectedSources(prev =>
+      prev.includes(name) ? prev.filter(s => s !== name) : [...prev, name]
+    );
   }
-  
-  function toggleTopic(topic) {
-    if (selectedTopics.includes(topic)) {
-      setSelectedTopics(selectedTopics.filter(t => t !== topic));
-    } else {
-      setSelectedTopics([...selectedTopics, topic]);
-    }
+
+  function toggleTopic(topic: string) {
+    setSelectedTopics(prev =>
+      prev.includes(topic) ? prev.filter(t => t !== topic) : [...prev, topic]
+    );
   }
-  
+
   function nextStep() {
-    if (currentStep < steps.length - 1) {
-      setCurrentStep(currentStep + 1);
-    }
+    if (currentStep < steps.length - 1) setCurrentStep(currentStep + 1);
   }
-  
+
   function prevStep() {
-    if (currentStep > 0) {
-      setCurrentStep(currentStep - 1);
-    }
+    if (currentStep > 0) setCurrentStep(currentStep - 1);
   }
-  
+
   function skipToEnd() {
     setCurrentStep(steps.length - 1);
   }
-  
+
   function renderContent() {
     switch (currentStep) {
       case 0:
@@ -111,7 +100,7 @@ function OnboardingPage() {
             </div>
           </div>
         );
-      
+
       case 1:
         return (
           <div className="text-center">
@@ -119,13 +108,13 @@ function OnboardingPage() {
             <h2 className="text-2xl font-bold mb-4">{steps[1].title}</h2>
             <p className="text-lg mb-6">{steps[1].description}</p>
             <div className="grid grid-cols-2 gap-3 mb-6">
-              {sources.map((source, i) => (
-                <div 
+              {sources.map((source: Source, i) => (
+                <div
                   key={i}
                   onClick={() => toggleSource(source.name)}
                   className={`p-3 border-2 rounded-lg flex items-center cursor-pointer ${
-                    selectedSources.includes(source.name) 
-                      ? 'border-indigo-500 bg-indigo-50' 
+                    selectedSources.includes(source.name)
+                      ? 'border-indigo-500 bg-indigo-50'
                       : 'border-gray-200'
                   }`}
                 >
@@ -139,7 +128,7 @@ function OnboardingPage() {
             </p>
           </div>
         );
-        
+
       case 2:
         return (
           <div className="text-center">
@@ -166,7 +155,7 @@ function OnboardingPage() {
             </p>
           </div>
         );
-        
+
       case 3:
         return (
           <div className="text-center">
@@ -192,7 +181,7 @@ function OnboardingPage() {
             </div>
           </div>
         );
-        
+
       case 4:
         return (
           <div className="text-center">
@@ -202,17 +191,17 @@ function OnboardingPage() {
             <h2 className="text-2xl font-bold mb-4">{steps[4].title}</h2>
             <p className="text-lg mb-6">{steps[4].description}</p>
             <button className="w-full bg-indigo-600 text-white py-3 rounded-lg font-medium flex items-center justify-center">
-              <Link href='/dashboard/protected-home'> Go to my feed </Link>
+              <Link href="/dashboard/protected-home">Go to my feed</Link>
               <ArrowRight size={18} className="ml-2" />
             </button>
           </div>
         );
-        
+
       default:
         return null;
     }
   }
-  
+
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
       {/* Progress bar */}
@@ -230,40 +219,31 @@ function OnboardingPage() {
           </div>
         </div>
       </div>
-      
+
       {/* Content */}
       <div className="flex-1 flex items-center p-4">
         <div className="max-w-md mx-auto w-full">
           {renderContent()}
         </div>
       </div>
-      
+
       {/* Navigation */}
       <div className="bg-white p-4 border-t">
         <div className="max-w-md mx-auto flex justify-between">
           {currentStep < steps.length - 1 ? (
             <>
               {currentStep > 0 ? (
-                <button 
-                  className="px-4 py-2 text-gray-600"
-                  onClick={prevStep}
-                >
+                <button className="px-4 py-2 text-gray-600" onClick={prevStep}>
                   Back
                 </button>
               ) : (
                 <div></div>
               )}
               <div>
-                <button 
-                  className="px-4 py-2 text-gray-500 mr-2"
-                  onClick={skipToEnd}
-                >
+                <button className="px-4 py-2 text-gray-500 mr-2" onClick={skipToEnd}>
                   Skip
                 </button>
-                <button 
-                  className="px-6 py-2 bg-indigo-600 text-white rounded-lg"
-                  onClick={nextStep}
-                >
+                <button className="px-6 py-2 bg-indigo-600 text-white rounded-lg" onClick={nextStep}>
                   Next
                 </button>
               </div>
