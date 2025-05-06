@@ -37,7 +37,7 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts"
-  ],
+, "src/app/dashboard/protected-home/page.js"  ],
   "exclude": [
     "node_modules"
   ]

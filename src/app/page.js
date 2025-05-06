@@ -1,12 +1,13 @@
 'use client';
-
-import React from 'react';
 import { useUser } from '@auth0/nextjs-auth0/client';
 import Link from 'next/link';
 import { ArrowRight, LogIn, LogOut } from 'lucide-react';
+import axios from 'axios';
+import React, { useEffect, useState } from 'react';
 
 export default function LandingPage() {
   const { user, isLoading } = useUser();
+
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col justify-between">

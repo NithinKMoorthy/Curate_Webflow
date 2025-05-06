@@ -28,7 +28,7 @@ const DataSourcesConfiguration = () => {
   const [activeTab, setActiveTab] = useState<'connected' | 'available'>('connected');
   const [showModal, setShowModal] = useState(false);
   const [currentSource, setCurrentSource] = useState<ConnectedSource | null>(null);
-
+  console.log("HELLO: ");
   const connectedSources: ConnectedSource[] = [
     {
       id: 1,

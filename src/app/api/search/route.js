@@ -9,9 +9,10 @@ export async function GET(req) {
   const { searchParams } = new URL(req.url);
   const token = searchParams.get("token");
   const query = searchParams.get("query");
+  const sources = searchParams.get("sources"); 
   console.log("TOKEN: ", token);
   console.log("QUERY: ", query);
-  const API_URL = `https://vj7uo68ik2.execute-api.us-west-2.amazonaws.com/search?query=${query}`;
+  const API_URL = `https://vj7uo68ik2.execute-api.us-west-2.amazonaws.com/api/search?query=${query}&sources=${sources}`;
 
   if (!token) {
     return NextResponse.json({ error: "Unauthorized: Missing token parameter" }, { status: 401 });

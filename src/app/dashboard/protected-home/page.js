@@ -1,82 +1,88 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useUser } from '@auth0/nextjs-auth0/client';
+import axios from 'axios';
 import {
   Bell, BookOpen, Search, Settings, Home,
   Bookmark, User, TrendingUp, Filter
 } from 'lucide-react';
 import Link from 'next/link';
 
-interface Tab {
-  id: string;
-  name: string;
-  Icon: React.ComponentType<{ size?: number }>;
-}
-
-interface ContentItem {
-  id: number;
-  type: string;
-  source: string;
-  title: string;
-  summary: string;
-  timestamp: string;
-  imageUrl: string;
-  engagement: string;
-}
-
 const ForYouPage = () => {
-  const [activeTab, setActiveTab] = useState<string>('forYou');
-  const [activeTopic, setActiveTopic] = useState<string>('All Content');
+  const [activeTab, setActiveTab] = useState('forYou');
+  const [accessToken, setAccessToken] = useState(null);
+  const { user, isLoading } = useUser();
+  const [search, setSearch] = useState('Exercise and Science');
+  const [selectedSources, setSelectedSources] = useState(['reddit']);
+  const [activeTopic, setActiveTopic] = useState('All Content');
+  const [contentItems, setContentItems] = useState([]);
 
-  const tabs: Tab[] = [
+  const tabs = [
     { id: 'forYou', name: 'For You', Icon: Home },
     { id: 'trending', name: 'Trending', Icon: TrendingUp },
     { id: 'saved', name: 'Saved', Icon: Bookmark },
   ];
 
-  const contentItems: ContentItem[] = [
-    {
-      id: 1,
-      type: 'podcast',
-      source: 'The Tech Perspective',
-      title: 'The Future of AI in Content Curation',
-      summary: 'This episode discusses how AI algorithms are revolutionizing content discovery and curation, making it easier for users to find relevant information in an increasingly crowded digital landscape.',
-      timestamp: '12 min read',
-      imageUrl: '/api/placeholder/60/60',
-      engagement: '423 discussions'
-    },
-    {
-      id: 2,
-      type: 'reddit',
-      source: 'r/ProductManagement',
-      title: 'How do you prioritize features when user feedback is contradictory?',
-      summary: 'A thread exploring different methodologies for feature prioritization when dealing with conflicting user feedback. Top comments emphasize the importance of data-driven decisions and clear product vision.',
-      timestamp: '8 min read',
-      imageUrl: '/api/placeholder/60/60',
-      engagement: '156 comments'
-    },
-    {
-      id: 3,
-      type: 'tweet',
-      source: 'X',
-      title: 'Thread: Building a successful SaaS in 2025',
-      summary: 'An insightful thread from a successful founder discussing the current state of SaaS development, covering topics like pricing strategies, customer acquisition, and retention tactics.',
-      timestamp: '5 min read',
-      imageUrl: '/api/placeholder/60/60',
-      engagement: '2.4k likes'
-    },
-    {
-      id: 4,
-      type: 'article',
-      source: 'Medium',
-      title: 'Designing For Information Overload',
-      summary: 'This article explores UX design principles that help users navigate and process large amounts of information without feeling overwhelmed, with practical examples from leading products.',
-      timestamp: '15 min read',
-      imageUrl: '/api/placeholder/60/60',
-      engagement: '3.2k claps'
-    }
-  ];
+  const allSources = ["All", "youtube", "reddit", "X", "Podcasts", "RSS", "Medium", "WebPages"];
 
-  const topics: string[] = [
+  useEffect(() => {
+    if (user) getAccessToken();
+  }, [user]);
+
+  const getAccessToken = async () => {
+    try {
+      const res = await axios.get('/api/auth/token');
+      const token = res.data.accessToken;
+      console.log('Access Token Response', token);
+      setAccessToken(token);
+      callDiscover(token);
+    } catch (err) {
+      console.error('Error fetching access token', err);
+    }
+  };
+
+  const toggleSource = (source) => {
+    setSelectedSources(prev =>
+      prev.includes(source)
+        ? prev.filter(s => s !== source)
+        : [...prev, source]
+    );
+  };
+
+  const callDiscover = async (tokenOverride) => {
+    console.log("CALL DISCOVER");
+    const token = tokenOverride || accessToken;
+    if (!token) return;
+
+    const sourceParams = selectedSources
+      .map(source => `sources=${encodeURIComponent(source)}`)
+      .join('&');
+
+    const url = `/api/search?token=${token}&query=${encodeURIComponent(search)}&${sourceParams}`;
+    console.log("TOKEN: ", token);
+    console.log("URL: ", url);
+    try {
+      const response = await axios.get(url);
+      console.log("RESPONSE.DATA: ", response.data.results);
+      const transformed = response.data.results.map(item => ({
+        id: item.id,
+        type: item.type,
+        source: item.subreddit || item.author || item.creator || 'Unknown Source',
+        title: item.title,
+        summary: item.snippet || '',
+        timestamp: new Date(item.publishDate).toLocaleDateString(),
+        imageUrl: item.thumbnailUrl || '/default-reddit-icon.png',
+        engagement: `${item.commentCount || 0} comments • ${item.upvotes || 0} upvotes`,
+        url: item.url, 
+      }));
+
+      setContentItems(transformed);
+    } catch (err) {
+      console.error("Error in callDiscover:", err);
+    }
+  };
+
+  const topics = [
     'All Content',
     'Technology',
     'Design',
@@ -97,12 +103,10 @@ const ForYouPage = () => {
               <Bell size={20} />
               <span className="absolute top-1 right-1 bg-red-500 rounded-full w-2 h-2"></span>
             </button>
-            <button className="p-2 text-gray-500 hover:text-gray-700">
-              <Link href='/dashboard/configuration'><Settings size={20} /></Link>
-            </button>
-            <button className="p-2 text-gray-500 hover:text-gray-700">
-              <User size={20} />
-            </button>
+            <Link href='/dashboard/configuration'>
+              <Settings size={20} className="p-2 text-gray-500 hover:text-gray-700" />
+            </Link>
+            <User size={20} className="p-2 text-gray-500 hover:text-gray-700" />
           </div>
         </div>
 
@@ -113,6 +117,11 @@ const ForYouPage = () => {
           </div>
           <input
             type="text"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') callDiscover();
+            }}
             placeholder="Search for content..."
             className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
           />
@@ -121,20 +130,19 @@ const ForYouPage = () => {
         {/* Source filters */}
         <div className="flex items-center space-x-2 overflow-x-auto pb-2">
           <span className="text-sm font-medium text-gray-700 whitespace-nowrap">Sources:</span>
-          {["All", "X", "Medium", "Reddit", "Podcasts", "RSS", "Webpages"].map(src => (
+          {allSources.map(src => (
             <button
               key={src}
-              className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded-full hover:bg-gray-200"
+              onClick={() => toggleSource(src)}
+              className={`px-2 py-1 text-xs rounded-full ${
+                selectedSources.includes(src)
+                  ? 'bg-indigo-100 text-indigo-700'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              }`}
             >
               {src}
             </button>
           ))}
-          <button className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded-full hover:bg-gray-200 flex items-center">
-            <span>More</span>
-            <svg className="w-3 h-3 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-            </svg>
-          </button>
         </div>
       </header>
 
@@ -151,7 +159,7 @@ const ForYouPage = () => {
               }`}
               onClick={() => setActiveTab(tab.id)}
             >
-              <span className="mr-2"><tab.Icon size={20} /></span>
+              <tab.Icon size={20} className="mr-2" />
               <span className="font-medium">{tab.name}</span>
             </button>
           ))}
@@ -164,12 +172,12 @@ const ForYouPage = () => {
           {topics.map(topic => (
             <button
               key={topic}
+              onClick={() => setActiveTopic(topic)}
               className={`px-3 py-1 rounded-full text-sm whitespace-nowrap ${
                 activeTopic === topic
                   ? 'bg-indigo-100 text-indigo-700'
                   : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
               }`}
-              onClick={() => setActiveTopic(topic)}
             >
               {topic}
             </button>
@@ -180,7 +188,7 @@ const ForYouPage = () => {
       {/* Main content */}
       <div className="flex-1 overflow-auto px-4 py-4">
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-lg font-medium text-gray-900">Your Personalized Feed</h2>
+          <h2 className="text-lg font-medium text-gray-900">Search Results</h2>
           <button className="flex items-center text-sm text-gray-600 hover:text-gray-900">
             <Filter size={16} className="mr-1" />
             <span>Filter</span>
@@ -204,12 +212,17 @@ const ForYouPage = () => {
                   </div>
                   <h3 className="text-base font-semibold text-gray-900 mb-1">{item.title}</h3>
                   <p className="text-sm text-gray-700 mb-2">{item.summary}</p>
-                  <button className="text-xs text-indigo-600 font-medium hover:text-indigo-800 mb-2 flex items-center">
+                  <a
+                    href={`/dashboard/summary?url=${encodeURIComponent(item.url)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-xs text-indigo-600 font-medium hover:text-indigo-800 mb-2 flex items-center"
+                  >
                     View entire summary
-                    <svg className="w-3 h-3 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <svg className="w-3 h-3 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                     </svg>
-                  </button>
+                  </a>
                   <div className="flex justify-between items-center">
                     <span className="text-xs text-gray-500">{item.engagement}</span>
                     <div className="flex space-x-3">
