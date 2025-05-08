@@ -38,11 +38,8 @@ const CurateArticlePage = () => {
   };
 
   const getSummary = async () => {
-    console.log("ACCESS TOKEN", accessToken);
-    console.log("URL: ", url);
     try {
       const res = await axios.get(`/api/getSummary?url=${url}&token=${accessToken}`);
-      console.log("Response: ", res.data);
       setSummaryObject(res.data);
     } catch (err) {
       console.error('Error fetching summary', err);
@@ -62,7 +59,7 @@ const CurateArticlePage = () => {
 
   const renderTopComments = (comments) => (
     <div className="space-y-4">
-      {comments?.map((c, idx) => (
+      {(comments || []).map((c, idx) => (
         <div key={idx} className="border-b pb-3">
           <div className="flex items-center mb-2">
             <div className="bg-gray-200 rounded-full h-8 w-8 flex items-center justify-center text-xs font-bold text-gray-700 mr-3">
@@ -77,16 +74,15 @@ const CurateArticlePage = () => {
           </div>
           <p className="text-gray-700 text-sm">{c.comment}</p>
         </div>
-      )) || <p className="text-gray-600 italic">No comments available.</p>}
+      ))}
     </div>
   );
 
   const renderInsights = (insights) => (
-
     <ul className="space-y-2 text-gray-700 list-disc list-inside">
-      {insights?.map((insight, idx) => (
+      {(insights || []).map((insight, idx) => (
         <li key={idx}>{insight.text}</li>
-      )) || <li>No insights available.</li>}
+      ))}
     </ul>
   );
 
