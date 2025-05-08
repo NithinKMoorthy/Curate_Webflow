@@ -82,6 +82,7 @@ const CurateArticlePage = () => {
   );
 
   const renderInsights = (insights) => (
+
     <ul className="space-y-2 text-gray-700 list-disc list-inside">
       {insights?.map((insight, idx) => (
         <li key={idx}>{insight.text}</li>
