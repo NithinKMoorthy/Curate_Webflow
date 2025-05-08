@@ -15,10 +15,19 @@ import { useUser } from '@auth0/nextjs-auth0/client';
 
 const CurateArticlePage = () => {
   const searchParams = useSearchParams();
-  const url = searchParams.get('url');
+ 
   const { user } = useUser();
   const [accessToken, setAccessToken] = useState(null);
   const [summaryObject, setSummaryObject] = useState(null);
+  const [url, setUrl] = useState(null);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const extractedUrl = params.get('url');
+      setUrl(extractedUrl);
+    }
+  }, []);
 
   useEffect(() => {
     if (user) getAccessToken();
