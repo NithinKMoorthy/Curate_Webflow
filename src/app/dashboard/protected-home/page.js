@@ -103,10 +103,15 @@ const ForYouPage = () => {
               <Bell size={20} />
               <span className="absolute top-1 right-1 bg-red-500 rounded-full w-2 h-2"></span>
             </button>
-            <Link href='/dashboard/configuration'>
-              <Settings size={20} className="p-2 text-gray-500 hover:text-gray-700" />
-            </Link>
-            <User size={20} className="p-2 text-gray-500 hover:text-gray-700" />
+            <button className="p-2 text-gray-500 hover:text-gray-700 relative">
+              <User size={20} className="p-2 text-gray-500 hover:text-gray-700" />
+            </button> 
+            <button className="p-2 text-gray-500 hover:text-gray-700 relative">
+              <Link href='/dashboard/configuration'>
+                <Settings size={20} className="p-2 text-gray-500 hover:text-gray-700" />
+              </Link>
+            </button> 
+            
           </div>
         </div>
 
