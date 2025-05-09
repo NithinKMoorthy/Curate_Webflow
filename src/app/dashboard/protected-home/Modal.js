@@ -6,33 +6,28 @@ import {
   BookOpen,
   BarChart2,
   BookMarked,
-  Share2,
 } from 'lucide-react';
 import axios from 'axios';
 import { useUser } from '@auth0/nextjs-auth0/client';
+import ReactMarkdown from 'react-markdown';
 
-// 🔄 Skeleton Loader with blur effect
 const SkeletonLoader = () => (
   <div className="p-6 font-sans bg-white animate-pulse space-y-6">
     <div className="flex items-center mb-2 space-x-3">
       <div className="h-4 w-32 bg-gray-200 rounded-full blur-sm" />
       <div className="h-4 w-16 bg-gray-200 rounded-full blur-sm" />
     </div>
-
     <div className="h-6 w-3/4 bg-gray-300 rounded-md blur-sm mb-4" />
-
     <div className="flex border-b mb-6">
       <div className="h-6 w-32 bg-gray-200 rounded blur-sm mr-4" />
       <div className="h-6 w-32 bg-gray-100 rounded blur-sm" />
     </div>
-
     <div className="bg-gray-100 rounded-lg p-6 mb-5 space-y-4">
       <div className="h-5 w-40 bg-gray-300 rounded blur-sm" />
       <div className="h-4 w-full bg-gray-200 rounded blur-sm" />
       <div className="h-4 w-5/6 bg-gray-200 rounded blur-sm" />
       <div className="h-4 w-2/3 bg-gray-200 rounded blur-sm" />
     </div>
-
     <div className="bg-gray-100 rounded-lg p-6 space-y-3">
       <div className="h-5 w-40 bg-gray-300 rounded blur-sm" />
       <div className="grid grid-cols-2 gap-4">
@@ -43,7 +38,6 @@ const SkeletonLoader = () => (
   </div>
 );
 
-// 🧠 Main Modal Component
 const CurateArticleModal = ({ url }) => {
   const { user } = useUser();
   const [accessToken, setAccessToken] = useState(null);
@@ -101,18 +95,22 @@ const CurateArticleModal = ({ url }) => {
               <ThumbsUp className="w-4 h-4 mr-1" /> {c.likes || 0}
             </div>
           </div>
-          <p className="text-gray-700 text-sm">{c.comment}</p>
+          <div className="text-gray-700 text-sm prose max-w-none">
+            <ReactMarkdown>{c.comment}</ReactMarkdown>
+          </div>
         </div>
       ))}
     </div>
   );
 
   const renderInsights = (insights) => (
-    <ul className="space-y-2 text-gray-700 list-disc list-inside">
+    <div className="space-y-2 text-gray-700 list-none pl-0">
       {(insights || []).map((insight, idx) => (
-        <li key={idx}>{insight.text}</li>
+        <div key={idx} className="prose max-w-none">
+          <ReactMarkdown>{insight.text}</ReactMarkdown>
+        </div>
       ))}
-    </ul>
+    </div>
   );
 
   if (!summaryObject) {
@@ -153,9 +151,11 @@ const CurateArticleModal = ({ url }) => {
           <BookOpen className="h-5 w-5 text-purple-600 mr-2" />
           <h2 className="text-lg font-semibold text-gray-800">Summary</h2>
         </div>
-        <p className="text-gray-700 mb-3 whitespace-pre-wrap">
-          {summaryObject?.summary || 'No summary found.'}
-        </p>
+        <div className="text-gray-700 prose max-w-none mb-3">
+          <ReactMarkdown>
+            {summaryObject?.summary || 'No summary found.'}
+          </ReactMarkdown>
+        </div>
       </div>
 
       {summaryObject?.topComments?.length > 0 && (
@@ -175,16 +175,6 @@ const CurateArticleModal = ({ url }) => {
             <h2 className="text-lg font-semibold text-gray-800">Actionable Insights</h2>
           </div>
           {renderInsights(summaryObject?.actionableInsights)}
-        </div>
-      )}
-
-      {summaryObject?.stats && (
-        <div className="bg-gray-50 rounded-lg p-6">
-          <div className="flex items-center mb-4">
-            <BarChart2 className="h-5 w-5 text-purple-600 mr-2" />
-            <h2 className="text-lg font-semibold text-gray-800">Key Statistics</h2>
-          </div>
-          {renderStats(summaryObject?.stats)}
         </div>
       )}
     </div>
