@@ -8,11 +8,14 @@ export async function GET(req) {
   // Extract token from request query parameters
   const { searchParams } = new URL(req.url);
   const token = searchParams.get("token");
-  const query = searchParams.get('query');
+  let query = searchParams.get('query');
   const sources = searchParams.getAll("sources"); // ✅ returns array
   if(token) console.log("TOKEN Found");
   console.log("Query: ", query);
   console.log("Selected Sources: ", sources);
+  if(!query) {
+    query="How to make the most out of life"
+  }
   const API_URL = `https://vj7uo68ik2.execute-api.us-west-2.amazonaws.com/api/search?query=${query}&sources=${sources}`;
 
   if (!token) {

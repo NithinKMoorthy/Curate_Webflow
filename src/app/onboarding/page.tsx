@@ -38,12 +38,12 @@ function OnboardingPage() {
   ];
 
   const sources: Source[] = [
-    { name: 'Reddit', icon: '/api/placeholder/40/40' },
-    { name: 'X (Twitter)', icon: '/api/placeholder/40/40' },
-    { name: 'Medium', icon: '/api/placeholder/40/40' },
-    { name: 'Podcasts', icon: '/api/placeholder/40/40' },
-    { name: 'YouTube', icon: '/api/placeholder/40/40' },
-    { name: 'RSS', icon: '/api/placeholder/40/40' }
+    { name: 'Reddit', icon: './default-reddit-icon.png' },
+    { name: 'X (Twitter)', icon: './x.png' },
+    { name: 'Medium', icon: './medium.png' },
+    { name: 'Podcasts', icon: './podcasts.png' },
+    { name: 'YouTube', icon: './youtube.png' },
+    { name: 'RSS', icon: './rss.png' }
   ];
 
   const topics = [
@@ -87,7 +87,7 @@ function OnboardingPage() {
       case 0:
         return (
           <div className="text-center">
-            <img src="/api/placeholder/300/200" alt="Welcome" className="mx-auto rounded-lg mb-6" />
+            <img src="./logo.jpeg" width="100" alt="Welcome" className="mx-auto rounded-lg mb-6" />
             <h2 className="text-2xl font-bold mb-4">{steps[0].title}</h2>
             <p className="text-lg mb-6">{steps[0].description}</p>
             <div className="space-y-3 mb-8">
@@ -104,7 +104,6 @@ function OnboardingPage() {
       case 1:
         return (
           <div className="text-center">
-            <img src="/api/placeholder/300/200" alt="Connect Sources" className="mx-auto rounded-lg mb-6" />
             <h2 className="text-2xl font-bold mb-4">{steps[1].title}</h2>
             <p className="text-lg mb-6">{steps[1].description}</p>
             <div className="grid grid-cols-2 gap-3 mb-6">
@@ -132,7 +131,6 @@ function OnboardingPage() {
       case 2:
         return (
           <div className="text-center">
-            <img src="/api/placeholder/300/200" alt="Topics" className="mx-auto rounded-lg mb-6" />
             <h2 className="text-2xl font-bold mb-4">{steps[2].title}</h2>
             <p className="text-lg mb-6">{steps[2].description}</p>
             <div className="flex flex-wrap justify-center gap-2 mb-6">
@@ -159,7 +157,6 @@ function OnboardingPage() {
       case 3:
         return (
           <div className="text-center">
-            <img src="/api/placeholder/300/200" alt="Summarization" className="mx-auto rounded-lg mb-6" />
             <h2 className="text-2xl font-bold mb-4">{steps[3].title}</h2>
             <p className="text-lg mb-6">{steps[3].description}</p>
             <div className="bg-gray-100 rounded-lg p-4 mb-6">
